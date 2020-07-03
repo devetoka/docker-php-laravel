@@ -7,12 +7,12 @@ volumes:
   mysql-data:
 
 services:
-  server:
+  laravel-applidation:
     build:
       context: .
       dockerfile: Dockerfile
       target: dev
-    container_name: ask-a-doc-server
+    container_name: laravel-app
     restart: unless-stopped
     ports: ['8000:8080']
     environment:
@@ -20,7 +20,7 @@ services:
     depends_on:
       - mysql
     volumes:
-      - ./:/var/www/html
+      - ./www:/var/www/html
 
     networks:
       server-net:
@@ -29,7 +29,7 @@ services:
 
   mysql:
     image: mysql:5.7
-    container_name: learnify-learniform-mysql
+    container_name: l-mysql-db
     restart: unless-stopped
     ports: ['3306:3306']
     volumes:

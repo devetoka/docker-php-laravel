@@ -73,8 +73,8 @@ RUN a2enmod rewrite headers
 FROM php AS builder
 
 WORKDIR /var/www/html
-COPY ./ ./
-
+COPY ./www ./
+RUN ls
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 RUN composer global require hirak/prestissimo \
@@ -92,11 +92,12 @@ ENV APP_ENV=dev
 COPY --chown=www-data --from=builder /var/www/html /var/www/html
 COPY --from=builder /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
+RUN ls
 RUN composer dump-autoload
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chgrp -R www-data /var/www/html/storage && chmod -R ug+rwx /var/www/html/storage /var/www/html/bootstrap
-
+RUN ls
 ENTRYPOINT ["sh","/usr/local/bin/entrypoint.sh"]
 
 
