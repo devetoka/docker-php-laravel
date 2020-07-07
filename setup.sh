@@ -1,14 +1,7 @@
 #!/bin/sh
 # set -e
-# get setup details
-declare -A details
-while IFS= read -r name || [[ -n "$name" ]]; do
-    arrIN=(${name//=/ })
-    details[${arrIN[0]}]=${arrIN[1]}
-done < .env.setup
-# install laravel using setup details
-composer create-project --prefer-dist laravel/laravel ./www ${details[LARAVEL_VERSION]}
 
+# TODO replace db in .env with db name in docker-compose
 #cp ./.env.docker.example ./www/.env
 #run docker
 docker-compose up --build

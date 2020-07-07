@@ -74,13 +74,28 @@ FROM php AS builder
 
 WORKDIR /var/www/html
 COPY ./www ./
-RUN ls
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 RUN composer global require hirak/prestissimo \
     && COMPOSER_MEMORY_LIMIT=-1 composer install \
     && composer global remove hirak/prestissimo
 
+
+#####################################
+##  BUILD NEW LARAVEL PROJECT      ##
+#####################################
+
+FROM php AS laravel
+
+WORKDIR /var/www/html
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+COPY ./ ./
+RUN ./laravel.sh
+
+COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chgrp -R www-data /var/www/html/storage && chmod -R ug+rwx /var/www/html/storage /var/www/html/bootstrap
+
+ENTRYPOINT ["sh","/usr/local/bin/entrypoint.sh"]
 
 #####################################
 ##        DEVELOPMENT ENVIRONMENT  ##
@@ -92,12 +107,10 @@ ENV APP_ENV=dev
 COPY --chown=www-data --from=builder /var/www/html /var/www/html
 COPY --from=builder /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
-RUN ls
 RUN composer dump-autoload
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chgrp -R www-data /var/www/html/storage && chmod -R ug+rwx /var/www/html/storage /var/www/html/bootstrap
-RUN ls
 ENTRYPOINT ["sh","/usr/local/bin/entrypoint.sh"]
 
 
